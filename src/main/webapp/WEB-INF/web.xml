@@ -3,4 +3,20 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
          version="6.0">
+
+    <resource-ref>
+        <description>MySQLDB Connection</description>
+        <res-ref-name>dbcp_mysql</res-ref-name>
+        <res-type>javax.sql.DataSource</res-type>
+        <res-auth>Container</res-auth>
+    </resource-ref>
+
+<!--    <servlet>-->
+<!--        <servlet-name>MVCBoardList</servlet-name>-->
+<!--        <servlet-class>model2.BoardListController</servlet-class>-->
+<!--    </servlet>-->
+<!--    <servlet-mapping>-->
+<!--        <servlet-name>MVCBoardList</servlet-name>-->
+<!--        <url-pattern>/mvcboard/list.do</url-pattern>-->
+<!--    </servlet-mapping>-->
 </web-app>
