@@ -14,9 +14,9 @@ public class MVCBoardDAO extends MySQConPool {
     public int selectCount(Map<String, Object> map) {
         int totalCount = 0;
         String sql = "select count(*) from mvcboard";
-        if(map.get("searchWord")!=null && !map.get("searchWord").equals("")){
-            sql += " where "+map.get("searchField")
-                    +" like '%"+map.get("searchWord")+"%'";
+        if (map.get("searchWord") != null && !map.get("searchWord").equals("")) {
+            sql += " where " + map.get("searchField")
+                    + " like '%" + map.get("searchWord") + "%'";
         }
 
         try {
@@ -34,12 +34,12 @@ public class MVCBoardDAO extends MySQConPool {
 
     public List<MVCBoardDTO> selectList(Map<String, Object> map) {
         List<MVCBoardDTO> boards = new ArrayList<MVCBoardDTO>();
-        String sql="select * from mvcboard";
-        if(map.get("searchWord")!=null && !map.get("searchWord").equals("")){
-            sql += " where "+map.get("searchField")
-                    +" like '%"+map.get("searchWord")+"%'";
+        String sql = "select * from mvcboard";
+        if (map.get("searchWord") != null && !map.get("searchWord").equals("")) {
+            sql += " where " + map.get("searchField")
+                    + " like '%" + map.get("searchWord") + "%'";
         }
-        sql +=" order by idx desc limit ?,?";
+        sql += " order by idx desc limit ?,?";
 
         try {
             pstmt = conn.prepareStatement(sql);
@@ -80,6 +80,100 @@ public class MVCBoardDAO extends MySQConPool {
             result = pstmt.executeUpdate();
 
         } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return result;
+    }
+
+    public MVCBoardDTO selectView(int idx) {
+        MVCBoardDTO board = null;
+        String sql = "select * from mvcboard where idx=?";
+
+        try {
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, idx);
+            rs = pstmt.executeQuery();
+            if (rs.next()) {
+                board = new MVCBoardDTO();
+                board.setIdx(idx);
+                board.setName(rs.getString("name"));
+                board.setTitle(rs.getString("title"));
+                board.setContent(rs.getString("content"));
+                board.setOfile(rs.getString("ofile"));
+                board.setSfile(rs.getString("sfile"));
+                board.setPostdate(rs.getDate("postdate"));
+                board.setPass(rs.getString("pass"));
+                board.setDowncount(rs.getInt("downcount"));
+                board.setVisitcount(rs.getInt("visitcount"));
+                board.setReplycount(rs.getInt("replycount"));
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return board;
+    }
+
+    public void updateVisitCount(int idx) {
+        String sql = "update mvcboard set visitcount=visitcount+1 where idx=?";
+        try {
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, idx);
+            pstmt.executeUpdate();
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    //패스워드 검증
+    public boolean confirmPassword(String pass, int idx){
+        boolean isCorr=false;
+        String sql="select count(*) from mvcboard where pass=? and idx=?";
+        try{
+            pstmt=conn.prepareStatement(sql);
+            pstmt.setString(1,pass);
+            pstmt.setInt(2,idx);
+            rs=pstmt.executeQuery();
+            if(rs.next()){
+                isCorr=true;
+            }
+
+        }catch (Exception ex){
+            isCorr=false;
+
+        }
+        return isCorr;
+    }
+
+    public int update(MVCBoardDTO dto) {
+        int result = 0;
+        String sql = "update mvcboard set title=?, name=?, content=?, ofile=?, sfile=? where idx=? and pass=?";
+        try {
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, dto.getTitle());
+            pstmt.setString(2, dto.getName());
+            pstmt.setString(3, dto.getContent());
+            pstmt.setString(4, dto.getOfile());
+            pstmt.setString(5, dto.getSfile());
+            pstmt.setInt(6, dto.getIdx());
+            pstmt.setString(7, dto.getPass());
+            result=pstmt.executeUpdate();
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return result;
+    }
+
+    public int delete(int idx){
+        int result=0;
+        String sql="delete from mvcboard where idx=?";
+        try {
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1,idx);
+            result=pstmt.executeUpdate();
+            System.out.println(result);
+        }catch (Exception ex){
             ex.printStackTrace();
         }
         return result;
