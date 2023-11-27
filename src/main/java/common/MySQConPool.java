@@ -12,7 +12,6 @@ public class MySQConPool {
     public Connection conn = null;
     public Statement stmt = null;
     public PreparedStatement pstmt = null;
-
     public ResultSet rs = null;
 
     public MySQConPool() {

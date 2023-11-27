@@ -14,9 +14,9 @@ public class MVCBoardDAO extends MySQConPool {
     public int selectCount(Map<String, Object> map) {
         int totalCount = 0;
         String sql = "select count(*) from mvcboard";
-        if (map.get("searchWord") != null && !map.get("searchWord").equals("")) {
-            sql += " where " + map.get("searchField")
-                    + " like '%'" + map.get("searchWord") + "%'";
+        if(map.get("searchWord")!=null && !map.get("searchWord").equals("")){
+            sql += " where "+map.get("searchField")
+                    +" like '%"+map.get("searchWord")+"%'";
         }
 
         try {
@@ -34,13 +34,12 @@ public class MVCBoardDAO extends MySQConPool {
 
     public List<MVCBoardDTO> selectList(Map<String, Object> map) {
         List<MVCBoardDTO> boards = new ArrayList<MVCBoardDTO>();
-        String sql = "select * from mvcboard";
-        if (map.get("searchWord") != null && !map.get("searchWord").equals("")) {
-            sql += " where " + map.get("searchField")
-                    + " like '%'" + map.get("searchWord") + "%'";
-
+        String sql="select * from mvcboard";
+        if(map.get("searchWord")!=null && !map.get("searchWord").equals("")){
+            sql += " where "+map.get("searchField")
+                    +" like '%"+map.get("searchWord")+"%'";
         }
-        sql += " order by idx desc limit ?,?";
+        sql +=" order by idx desc limit ?,?";
 
         try {
             pstmt = conn.prepareStatement(sql);
