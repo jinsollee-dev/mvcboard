@@ -2,6 +2,8 @@ package model2;
 
 import common.MySQConPool;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -126,9 +128,15 @@ public class MVCBoardDAO extends MySQConPool {
     }
 
     //패스워드 검증
-    public boolean confirmPassword(String pass, int idx){
+    public boolean confirmPassword(String pass, int idx, String mode){
         boolean isCorr=false;
-        String sql="select count(*) from mvcboard where pass=? and idx=?";
+        String sql="";
+        if(mode.equals("reply_del")){
+            sql="select count(*) from reply where pass=? and ridx=?";
+        } else {
+            sql="select count(*) from mvcboard where pass=? and idx=?";
+        }
+
         try{
             pstmt=conn.prepareStatement(sql);
             pstmt.setString(1,pass);
@@ -177,5 +185,73 @@ public class MVCBoardDAO extends MySQConPool {
             ex.printStackTrace();
         }
         return result;
+    }
+
+    public void downCountPlus(int idx) {
+        String sql="update mvcboard set downcount=downcount+1 where idx=?";
+        try {
+            pstmt=conn.prepareStatement(sql);
+            pstmt.setInt(1,idx);
+            pstmt.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public int insertReply(ReplyDTO dto) {
+        int result=0;
+        String sql="insert reply(bno,name,content,pass) values(?,?,?,?)";
+
+        try{
+            pstmt=conn.prepareStatement(sql);
+            pstmt.setInt(1, dto.getBno());
+            pstmt.setString(2, dto.getName());
+            pstmt.setString(3, dto.getContent());
+            pstmt.setString(4, dto.getPass());
+            result=pstmt.executeUpdate();
+
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+        return result;
+    }
+
+    public List<ReplyDTO> selectListReply(int bno) {
+        List<ReplyDTO> replyDTOList=new ArrayList<>();
+        String sql="select * from reply where bno=?";
+        try{
+            pstmt=conn.prepareStatement(sql);
+            pstmt.setInt(1,bno);
+            rs=pstmt.executeQuery();
+            while (rs.next()){
+                ReplyDTO dto=new ReplyDTO();
+                dto.setRidx(rs.getInt("ridx"));
+                dto.setBno(rs.getInt("bno"));
+                dto.setName(rs.getString("name"));
+                dto.setContent(rs.getString("content"));
+                dto.setPass(rs.getString("pass"));
+                dto.setPostdate(rs.getDate("postdate"));
+                replyDTOList.add(dto);
+            }
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+        return replyDTOList;
+    }
+
+    public int replyDelete(int ridx) {
+        int result=0;
+        String sql="delete from reply where ridx=?";
+        try{
+           pstmt=conn.prepareStatement(sql);
+            pstmt.setInt(1, ridx);
+            result=pstmt.executeUpdate();
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+        return result;
+
+
     }
 }

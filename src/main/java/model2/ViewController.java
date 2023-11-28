@@ -20,6 +20,7 @@ public class ViewController extends HttpServlet {
         int idx=Integer.parseInt(req.getParameter("idx"));
         dao.updateVisitCount(idx);
         MVCBoardDTO dto=dao.selectView(idx);
+        List<ReplyDTO> replyDTOList=dao.selectListReply(idx);
         dao.close();
 
         //파일을 가져오는데 확장자 분리해서 그림파일인 경우는 이미지 출력
@@ -35,6 +36,8 @@ public class ViewController extends HttpServlet {
         if(mimeList.contains(ext)){
             isImage=true;
         }
+
+        req.setAttribute("replyList",replyDTOList);
         req.setAttribute("dto", dto);
         req.setAttribute("isImg", isImage);
         req.getRequestDispatcher("/board/view.jsp").forward(req, resp);

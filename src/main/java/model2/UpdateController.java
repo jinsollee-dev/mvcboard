@@ -40,7 +40,7 @@ public class UpdateController extends HttpServlet {
             originalFileName=FileUtil.uploadFile(req,saveDirectory);
 
         }catch (Exception ex){
-            JSFunction.alertBack(resp, "파일업로드 오륲");
+            JSFunction.alertBack(resp, "파일업로드 오류");
 
         }
         int idx=Integer.parseInt(req.getParameter("idx"));

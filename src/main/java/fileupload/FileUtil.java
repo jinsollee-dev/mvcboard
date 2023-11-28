@@ -7,8 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -46,5 +45,45 @@ public class FileUtil {
         if(file.exists()){
             file.delete();
         }
+    }
+
+    public static void download(HttpServletRequest req, HttpServletResponse resp,
+                                String savedDirectory, String sfileName, String ofileName) {
+        String sDirectory=req.getServletContext().getRealPath(savedDirectory);
+        try{
+            File file = new File(sDirectory, sfileName);
+            InputStream inputStream = new FileInputStream(file);
+
+            //한글파일명 깨짐 방지
+            String client=req.getHeader("User-Agent");
+            if(client.indexOf("WOW64")==-1){
+                ofileName=new String(ofileName.getBytes("UTF-8"),"ISO-8859-1");
+
+            }else{
+                ofileName=new String(ofileName.getBytes("KSC5601"),"ISO-8859-1");
+            }
+
+            //파일 다운로드형 응답 헤더 설정
+            resp.reset();
+            resp.setContentType("application/octet-stream");
+            resp.setHeader("Content-Disposition","attachment; filename=\""+ofileName+"\"");
+            resp.setHeader("Content-Length",""+file.length());
+
+            //resonse 객체로부터 출력스트림 생성 후 다운로드
+            OutputStream outputStream=resp.getOutputStream();
+            byte[] b=new byte[(int)file.length()]; //파일크기만큼 byte배열 생성
+            int readBuffer=0;
+            while ((readBuffer=inputStream.read(b))>0){
+                outputStream.write(b,0,readBuffer);
+            }
+            outputStream.close();
+            inputStream.close();
+
+        }catch (FileNotFoundException ex){
+            ex.printStackTrace();
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+
     }
 }

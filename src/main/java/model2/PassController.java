@@ -26,9 +26,10 @@ public class PassController extends HttpServlet {
         String mode = req.getParameter("mode");
         String pass = req.getParameter("pass");
         MVCBoardDAO dao = new MVCBoardDAO();
-        boolean confirmed = dao.confirmPassword(pass, idx);
+        //dao에서 비밀번호 검증
+        boolean confirmed = dao.confirmPassword(pass, idx, mode);
         dao.close();
-
+        //mode값에 따라 처리
         if (confirmed) {
             if (mode.equals("edit")) {
                 HttpSession session = req.getSession();
@@ -44,6 +45,9 @@ public class PassController extends HttpServlet {
                     FileUtil.deleteFile(req, "/uploads", saveFileName); //폴더에서 해당 파일도 삭제
                 }
                 JSFunction.alertLocation(resp, "삭제되었습니다", "/mvcboard/list.do");
+            }else if(mode.equals("reply_del")){
+                resp.sendRedirect("/mvcboard/reply.do?ridx="+idx); //replycontroller로 get으로 이동
+
             }
 
         } else {
